@@ -32,6 +32,10 @@ export default defineConfig({
     // 资源内联阈值
     assetsInlineLimit: 4096
   },
+  // 模块预加载配置 - 替换已弃用的polyfillModulePreload
+  modulePreload: {
+    polyfill: true
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
