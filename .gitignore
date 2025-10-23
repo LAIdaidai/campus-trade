@@ -1,0 +1,143 @@
+# ===========================================
+# 校园交易平台 - .gitignore 配置文件
+# ===========================================
+
+# 环境变量文件（包含敏感信息）
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.development
+
+# ===========================================
+# 依赖包和包管理器文件
+# ===========================================
+# Node.js 依赖
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# 包管理器锁文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-shrinkwrap.json
+
+# 包管理器日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ===========================================
+# 构建输出和编译产物
+# ===========================================
+# 构建目录
+dist/
+build/
+*/dist/
+*/build/
+**/dist/
+**/build/
+
+# TypeScript 编译产物
+*.tsbuildinfo
+*.d.ts.map
+*.js.map
+
+# ===========================================
+# 日志文件
+# ===========================================
+# 应用日志
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# PM2 日志
+.pm2/
+pm2.log
+*.pm2.log
+
+# 系统日志
+/var/log/campus-trade/
+
+# ===========================================
+# 编辑器和IDE
+# ===========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ===========================================
+# 操作系统文件
+# ===========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===========================================
+# 临时文件和缓存
+# ===========================================
+*.tmp
+*.temp
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+
+# ===========================================
+# 部署和配置文件
+# ===========================================
+# PM2 配置
+ecosystem.config.js
+ecosystem.config.json
+
+# Docker 相关
+.dockerignore
+docker-compose.override.yml
+
+# ===========================================
+# 上传文件（根据需求调整）
+# ===========================================
+# 如果不需要提交上传文件，取消下面的注释
+# uploads/
+# */uploads/
+# **/uploads/
+
+# ===========================================
+# 测试和覆盖率
+# ===========================================
+coverage/
+.nyc_output/
+.coverage/
+*.lcov
+
+# ===========================================
+# 其他
+# ===========================================
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
+*.7z

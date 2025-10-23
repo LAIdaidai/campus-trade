@@ -1,0 +1,174 @@
+{
+  "name": "校园二手交易",
+  "identifier": "com.campus.trade",
+  "version": "1.0.0",
+  "productName": "校园二手交易",
+  "description": "校园二手商品交易平台",
+  "author": "Campus Trade Team",
+  "url": "http://your-server-url.com",
+  "icon": "./frontend/public/favicon.ico",
+  "width": 375,
+  "height": 812,
+  "fullscreen": false,
+  "resizable": true,
+  "transparent": false,
+  "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
+  "show_system_tray": false,
+  "system_tray_icon": "./frontend/public/favicon.ico",
+  "inject": [],
+  "tauri": {
+    "permissions": {
+      "camera": {
+        "description": "需要访问相机以拍摄商品照片和头像",
+        "required": true
+      },
+      "microphone": {
+        "description": "需要访问麦克风以支持语音通话功能",
+        "required": true
+      },
+      "photo_library": {
+        "description": "需要访问相册以选择图片",
+        "required": true
+      },
+      "audio": {
+        "description": "需要访问音频输出以播放消息提示音",
+        "required": true
+      },
+      "notifications": {
+        "description": "需要发送通知以提醒新消息",
+        "required": true
+      },
+      "location": {
+        "description": "需要访问位置以显示附近的商品（可选）",
+        "required": false
+      },
+      "storage": {
+        "description": "需要访问存储以缓存图片和数据",
+        "required": true
+      },
+      "network": {
+        "description": "需要网络访问以连接服务器",
+        "required": true
+      }
+    },
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "execute": false,
+        "open": true,
+        "scope": []
+      },
+      "fs": {
+        "all": false,
+        "readFile": true,
+        "writeFile": true,
+        "scope": ["$APPDATA", "$TEMP"]
+      },
+      "window": {
+        "all": false,
+        "create": false,
+        "center": true,
+        "requestUserAttention": true,
+        "setResizable": true,
+        "setTitle": true,
+        "maximize": true,
+        "minimize": true,
+        "show": true,
+        "hide": true,
+        "close": true,
+        "setDecorations": true,
+        "setAlwaysOnTop": false,
+        "setSize": true,
+        "setMinSize": true,
+        "setMaxSize": true,
+        "setPosition": true,
+        "setFullscreen": true,
+        "setFocus": true,
+        "setIcon": true,
+        "setSkipTaskbar": false,
+        "setCursorGrab": false,
+        "setCursorVisible": true,
+        "setCursorIcon": true,
+        "setCursorPosition": false,
+        "startDragging": true,
+        "print": false
+      },
+      "http": {
+        "all": true,
+        "scope": ["http://**", "https://**"]
+      },
+      "notification": {
+        "all": true
+      },
+      "clipboard": {
+        "all": true,
+        "writeText": true,
+        "readText": true
+      },
+      "dialog": {
+        "all": true,
+        "ask": true,
+        "confirm": true,
+        "message": true,
+        "open": true,
+        "save": true
+      }
+    },
+    "windows": [
+      {
+        "title": "校园二手交易",
+        "width": 375,
+        "height": 812,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: https: http:; media-src 'self' https: http:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' ws: wss: http: https:"
+    },
+    "bundle": {
+      "active": true,
+      "icon": [
+        "./frontend/public/favicon.ico"
+      ],
+      "identifier": "com.campus.trade",
+      "category": "Shopping",
+      "shortDescription": "校园二手交易平台",
+      "longDescription": "一个专为校园设计的二手商品交易平台，支持商品发布、在线聊天、订单管理等功能。",
+      "copyright": "Copyright © 2024 Campus Trade Team",
+      "deb": {
+        "depends": []
+      },
+      "macOS": {
+        "frameworks": [],
+        "minimumSystemVersion": "10.13",
+        "exceptionDomain": ""
+      },
+      "iOS": {
+        "frameworks": [],
+        "minimumSystemVersion": "13.0"
+      },
+      "android": {
+        "minSdkVersion": 24,
+        "permissions": [
+          "android.permission.CAMERA",
+          "android.permission.RECORD_AUDIO",
+          "android.permission.READ_EXTERNAL_STORAGE",
+          "android.permission.WRITE_EXTERNAL_STORAGE",
+          "android.permission.INTERNET",
+          "android.permission.ACCESS_NETWORK_STATE",
+          "android.permission.ACCESS_FINE_LOCATION",
+          "android.permission.ACCESS_COARSE_LOCATION",
+          "android.permission.VIBRATE",
+          "android.permission.WAKE_LOCK",
+          "android.permission.POST_NOTIFICATIONS"
+        ]
+      }
+    }
+  }
+}
+
