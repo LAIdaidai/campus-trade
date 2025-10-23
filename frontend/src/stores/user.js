@@ -116,14 +116,44 @@ export const useUserStore = defineStore('user', () => {
     try {
       const response = await userApi.getProfile()
       setUserInfo(response.user)
+      return { success: true, user: response.user }
     } catch (error) {
       console.error('获取用户信息失败:', error)
       // 如果 token 失效，清除登录状态
       if (error.response?.status === 401 || error.response?.status === 403) {
         logout()
-        // 跳转到登录页
-        window.location.href = '/auth'
+        return { success: false, error: 'TOKEN_EXPIRED' }
       }
+      return { success: false, error: 'NETWORK_ERROR' }
+    }
+  }
+
+  // 验证用户状态（页面刷新时调用）
+  const validateUser = async () => {
+    // 如果没有token，直接返回未登录
+    if (!token.value) {
+      return { success: false, error: 'NO_TOKEN' }
+    }
+
+    // 如果token已过期，清除状态
+    if (!isTokenValid()) {
+      logout()
+      return { success: false, error: 'TOKEN_EXPIRED' }
+    }
+
+    // 如果有用户信息，直接返回成功
+    if (userInfo.value) {
+      return { success: true, user: userInfo.value }
+    }
+
+    // 尝试获取用户信息
+    try {
+      const result = await fetchProfile()
+      return result
+    } catch (error) {
+      console.error('验证用户失败:', error)
+      logout()
+      return { success: false, error: 'VALIDATION_FAILED' }
     }
   }
 
@@ -154,6 +184,7 @@ export const useUserStore = defineStore('user', () => {
     login,
     logout,
     fetchProfile,
-    updateProfile
+    updateProfile,
+    validateUser
   }
 })

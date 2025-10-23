@@ -16,7 +16,7 @@
           @click="selectConversation(conv)"
         >
           <div class="avatar">
-            <img :src="getImageUrl(conv.other_user_avatar) || '/default-avatar.png'" :alt="conv.other_user_name" />
+            <img :src="getAvatarUrl(conv.other_user_avatar, conv.other_user_name)" :alt="conv.other_user_name" />
           </div>
           <div class="conversation-info">
             <div class="top-row">
@@ -69,7 +69,7 @@
             </svg>
           </button>
           <div class="user-info">
-            <img :src="getImageUrl(currentConversation.other_user_avatar) || '/default-avatar.png'" alt="" class="avatar" />
+            <img :src="getAvatarUrl(currentConversation.other_user_avatar, currentConversation.other_user_name)" alt="" class="avatar" />
             <div class="info">
               <div class="name">{{ currentConversation.other_user_name }}</div>
               <div class="product-name">
@@ -95,7 +95,7 @@
             <!-- 文本消息 -->
             <template v-if="message.type === 'text'">
               <div class="message-avatar">
-                <img :src="getImageUrl(message.sender_avatar) || '/default-avatar.png'" alt="" />
+                <img :src="getAvatarUrl(message.sender_avatar, message.sender_name)" alt="" />
               </div>
               <div class="message-content">
                 <div class="message-bubble">
@@ -214,10 +214,27 @@ import { getImageUrl } from '../config';
 const router = useRouter();
 const userStore = useUserStore();
 
+// 获取头像URL，带智能回退
+const getAvatarUrl = (avatar, username) => {
+  if (avatar) {
+    const avatarUrl = getImageUrl(avatar);
+    if (avatarUrl) {
+      return avatarUrl;
+    }
+  }
+  
+  // 使用UI Avatars生成默认头像
+  const name = username || '用户';
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ff2442&color=fff&size=150`;
+};
+
 // 数据
 const conversations = ref([]);
 const currentConversation = ref(null);
 const messages = ref([]);
+
+// 用户验证状态
+const isUserValid = ref(false);
 const messageInput = ref('');
 const isLoadingMessages = ref(false);
 const isTyping = ref(false);
@@ -653,6 +670,17 @@ const handleMessagesRead = (data) => {
 
 // 生命周期
 onMounted(async () => {
+  // 验证用户状态
+  const validation = await userStore.validateUser();
+  if (!validation.success) {
+    console.log('消息页面用户验证失败:', validation.error);
+    userStore.logout();
+    router.push('/');
+    return;
+  }
+  
+  isUserValid.value = true;
+  
   // 检测移动端
   checkMobile();
   window.addEventListener('resize', checkMobile);

@@ -75,24 +75,36 @@ const router = createRouter({
 });
 
 // 路由守卫 - 检查登录状态
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore();
-  
-  // 检查登录状态：使用store中的isLoggedIn计算属性
-  const isAuthenticated = userStore.isLoggedIn;
   
   // 如果目标路由需要认证
   if (to.meta.requiresAuth) {
-    if (!isAuthenticated) {
-      // 未登录,跳转到登录页
-      next({ name: 'Auth' });
+    // 验证用户状态
+    const validation = await userStore.validateUser();
+    
+    if (!validation.success) {
+      console.log('用户验证失败:', validation.error);
+      // 清除无效的认证数据
+      userStore.logout();
+      // 跳转到首页
+      next({ name: 'Home' });
+      return;
+    }
+    
+    // 用户验证成功，继续导航
+    next();
+  } else if (to.name === 'Auth') {
+    // 访问登录页时，检查是否已登录
+    const validation = await userStore.validateUser();
+    if (validation.success) {
+      // 已登录用户访问登录页,跳转到首页
+      next({ name: 'Home' });
     } else {
       next();
     }
-  } else if (to.name === 'Auth' && isAuthenticated) {
-    // 已登录用户访问登录页,跳转到首页
-    next({ name: 'Home' });
   } else {
+    // 公开页面，直接导航
     next();
   }
 });
