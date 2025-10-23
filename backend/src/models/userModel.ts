@@ -14,16 +14,31 @@ export interface User {
 export class UserModel {
   static async create(user: Omit<User, 'id' | 'created_at' | 'updated_at' | 'phone'>): Promise<number> {
     const { username, email, password, avatar } = user;
-    const [result] = await pool.execute(
-      'INSERT INTO users (username, email, password, avatar) VALUES (?, ?, ?, ?)',
-      [username, email, password, avatar || null]
-    );
-    return (result as any).insertId;
+    try {
+      const [result] = await pool.execute(
+        'INSERT INTO users (username, email, password, avatar) VALUES (?, ?, ?, ?)',
+        [username, email, password, avatar || null]
+      );
+      return (result as any).insertId;
+    } catch (error: any) {
+      console.error('用户创建失败:', {
+        username,
+        email,
+        error: {
+          code: error.code,
+          errno: error.errno,
+          sqlState: error.sqlState,
+          message: error.message,
+          sql: error.sql
+        }
+      });
+      throw error; // 重新抛出错误，让控制器处理
+    }
   }
 
   static async findByEmail(email: string): Promise<User | null> {
     const [rows] = await pool.execute(
-      'SELECT * FROM users WHERE email = ?',
+      'SELECT * FROM users WHERE email = ? LIMIT 1',
       [email]
     );
     const users = rows as User[];
@@ -48,7 +63,7 @@ export class UserModel {
 
   static async findByUsername(username: string): Promise<User | null> {
     const [rows] = await pool.execute(
-      'SELECT * FROM users WHERE username = ?',
+      'SELECT * FROM users WHERE username = ? LIMIT 1',
       [username]
     );
     const users = rows as User[];

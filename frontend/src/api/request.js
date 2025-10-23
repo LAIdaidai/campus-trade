@@ -4,7 +4,7 @@ import axios from 'axios'
 const api = axios.create({
   // 默认走前端容器的反向代理，Docker生产为 /api
   baseURL: import.meta.env.VITE_API_URL || '/api',
-  timeout: 30000,  // 增加到30秒，因为邮件发送可能需要较长时间
+  timeout: 15000,  // 15秒超时，对于注册来说应该足够
   headers: {
     'Content-Type': 'application/json'
   }

@@ -43,25 +43,24 @@ export class UserController {
         return;
       }
 
-      // 检查用户名是否已存在
-      const existingUsername = await UserModel.findByUsername(username);
+      // 并行检查用户名、邮箱是否存在，同时开始密码加密
+      const [existingUsername, existingEmail, hashedPassword] = await Promise.all([
+        UserModel.findByUsername(username),
+        UserModel.findByEmail(email),
+        bcrypt.hash(password, 10)  // 并行加密密码
+      ]);
+
       if (existingUsername) {
         res.status(400).json({ error: '用户名已被使用，请换一个' });
         return;
       }
 
-      // 检查邮箱是否已存在
-      const existingEmail = await UserModel.findByEmail(email);
       if (existingEmail) {
         res.status(400).json({ error: '该邮箱已被注册' });
         return;
       }
 
-      // 加密密码
-      const hashedPassword = await bcrypt.hash(password, 12);
-
       // 生成默认头像URL (使用UI Avatars API)
-      // 参数说明: name=用户名, background=背景色, color=文字颜色, size=尺寸
       const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&color=fff&size=200`;
 
       // 创建用户
@@ -82,7 +81,75 @@ export class UserController {
       });
     } catch (error) {
       console.error('Registration error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      
+      // 根据错误类型提供具体的错误信息
+      let errorMessage = 'Internal server error';
+      let statusCode = 500;
+      
+      if (error.code === 'ER_DUP_ENTRY') {
+        // MySQL 重复键错误
+        if (error.message.includes('username')) {
+          errorMessage = '用户名已被使用，请换一个';
+          statusCode = 400;
+        } else if (error.message.includes('email')) {
+          errorMessage = '该邮箱已被注册';
+          statusCode = 400;
+        } else {
+          errorMessage = '数据重复，请检查输入信息';
+          statusCode = 400;
+        }
+      } else if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+        errorMessage = '数据库引用错误';
+      } else if (error.code === 'ER_BAD_FIELD_ERROR') {
+        errorMessage = '数据库字段错误';
+      } else if (error.code === 'ER_ACCESS_DENIED_ERROR') {
+        errorMessage = '数据库访问被拒绝，请检查数据库配置';
+      } else if (error.code === 'ECONNREFUSED') {
+        errorMessage = '无法连接到数据库，请检查数据库服务状态';
+      } else if (error.code === 'ETIMEDOUT') {
+        errorMessage = '数据库连接超时';
+      } else if (error.code === 'PROTOCOL_CONNECTION_LOST') {
+        errorMessage = '数据库连接丢失';
+      } else if (error.code === 'ER_CON_COUNT_ERROR') {
+        errorMessage = '数据库连接数过多';
+      } else if (error.code === 'ER_TOO_MANY_USER_CONNECTIONS') {
+        errorMessage = '数据库用户连接数超限';
+      } else if (error.code === 'ER_DBACCESS_DENIED_ERROR') {
+        errorMessage = '数据库访问权限不足';
+      } else if (error.code === 'ER_BAD_DB_ERROR') {
+        errorMessage = '数据库不存在';
+      } else if (error.code === 'ER_ACCESS_DENIED_ERROR') {
+        errorMessage = '数据库用户名或密码错误';
+      } else if (error.code === 'ER_HOST_NOT_PRIVILEGED') {
+        errorMessage = '数据库主机访问权限不足';
+      } else if (error.code === 'ER_CANNOT_CONNECT') {
+        errorMessage = '无法连接到数据库服务器';
+      } else if (error.code === 'ER_HANDSHAKE_ERROR') {
+        errorMessage = '数据库握手失败';
+      } else if (error.code === 'ER_UNKNOWN_ERROR') {
+        errorMessage = '未知数据库错误';
+      } else if (error.message) {
+        // 如果错误有消息，显示具体信息
+        errorMessage = `数据库错误: ${error.message}`;
+      }
+      
+      console.error('具体错误信息:', {
+        code: error.code,
+        errno: error.errno,
+        sqlState: error.sqlState,
+        message: error.message,
+        sql: error.sql
+      });
+      
+      res.status(statusCode).json({ 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? {
+          code: error.code,
+          errno: error.errno,
+          sqlState: error.sqlState,
+          message: error.message
+        } : undefined
+      });
     }
   }
 

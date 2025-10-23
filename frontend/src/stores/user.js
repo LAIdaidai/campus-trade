@@ -66,9 +66,23 @@ export const useUserStore = defineStore('user', () => {
       return { success: true, message: response.message }
     } catch (error) {
       console.error('注册失败:', error)
+      
+      // 根据错误类型提供更具体的错误信息
+      let errorMessage = '注册失败，请稍后重试'
+      
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = '注册请求超时，请检查网络连接'
+      } else if (error.message?.includes('Network Error')) {
+        errorMessage = '网络连接失败，请检查服务器状态'
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = '请求超时，请稍后重试'
+      }
+      
       return { 
         success: false, 
-        message: error.response?.data?.error || '注册失败，请稍后重试' 
+        message: errorMessage
       }
     } finally {
       loading.value = false

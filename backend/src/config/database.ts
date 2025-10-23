@@ -15,8 +15,12 @@ const dbConfig = {
   password: process.env.DB_PASSWORD!,
   database: process.env.DB_NAME!,
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  connectionLimit: 20,  // 增加连接池大小
+  queueLimit: 0,
+  acquireTimeout: 60000,  // 获取连接超时时间
+  timeout: 60000,  // 查询超时时间
+  reconnect: true,  // 自动重连
+  charset: 'utf8mb4'  // 确保字符集正确
 };
 
 // 创建连接池
@@ -34,14 +38,28 @@ export const connectDatabase = async (maxRetries: number = 10, retryDelay: numbe
       console.log('✅ MySQL database connected successfully');
       connection.release();
       return; // 连接成功，退出函数
-    } catch (error) {
+    } catch (error: any) {
       lastError = error;
       
+      // 详细的错误信息
+      console.error(`❌ Database connection attempt ${attempt}/${maxRetries} failed:`, {
+        code: error.code,
+        errno: error.errno,
+        sqlState: error.sqlState,
+        message: error.message,
+        config: {
+          host: dbConfig.host,
+          port: dbConfig.port,
+          user: dbConfig.user,
+          database: dbConfig.database
+        }
+      });
+      
       if (attempt < maxRetries) {
-        console.log(`⚠️  Database connection attempt ${attempt}/${maxRetries} failed. Retrying in ${retryDelay/1000}s...`);
+        console.log(`⚠️  Retrying in ${retryDelay/1000}s...`);
         await sleep(retryDelay);
       } else {
-        console.error(`❌ Database connection failed after ${maxRetries} attempts:`, error);
+        console.error(`❌ Database connection failed after ${maxRetries} attempts`);
       }
     }
   }
