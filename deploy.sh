@@ -971,13 +971,8 @@ deploy_all() {
     create_directories
     check_project
     
-    # 处理Git更新
-    if [ -d "$PROJECT_DIR/.git" ]; then
-        cd "$PROJECT_DIR"
-        handle_git_conflicts
-    else
-        echo -e "${YELLOW}警告: 未检测到Git仓库，跳过代码更新${NC}"
-    fi
+    # 跳过Git检测（一键部署不需要Git处理）
+    echo -e "${GREEN}✓ 一键部署模式，跳过Git检测${NC}"
     
     start_mysql
     install_dependencies

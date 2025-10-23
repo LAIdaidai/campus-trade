@@ -99,12 +99,8 @@ command -v npm >/dev/null 2>&1 || { echo -e "${RED}npm 未安装${NC}"; exit 1; 
 command -v pm2 >/dev/null 2>&1 || { echo -e "${YELLOW}安装PM2...${NC}"; npm install -g pm2; }
 command -v docker >/dev/null 2>&1 || { echo -e "${RED}Docker 未安装${NC}"; exit 1; }
 
-# 处理Git更新
-if [ -d ".git" ]; then
-    handle_git_conflicts
-else
-    echo -e "${YELLOW}警告: 未检测到Git仓库，跳过代码更新${NC}"
-fi
+# 跳过Git检测（一键部署不需要Git处理）
+echo -e "${GREEN}✓ 一键部署模式，跳过Git检测${NC}"
 
 # 创建目录
 echo -e "${BLUE}创建目录...${NC}"
